@@ -19,7 +19,7 @@ install_missing_packages()
 
 
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel,QSpacerItem,QSizePolicy, QLineEdit, QVBoxLayout,QGridLayout, QPushButton, QDialog, QFormLayout, QDialogButtonBox,QHBoxLayout
-from PyQt5.QtGui import QPixmap,QPalette # Import QPixmap for handling images
+from PyQt5.QtGui import QPixmap,QPalette,QIcon # Import QPixmap for handling images
 from PyQt5.QtCore import Qt  # Import QPixmap for handling images
 import requests
 from git import Repo
@@ -32,12 +32,17 @@ class LoginDialog(QDialog):
         
         self.setWindowTitle("Authentication Required")
         self.setStyleSheet("background-color: #0e1425;")  # Set the background color here
+
         
                 # Create a QLabel for the text
         text_label = QLabel("CodeLock®")
-        text_label.setStyleSheet("color: white;font-weight: bold; font-size: 20px;")
+        text_label.setStyleSheet("color: white; font-weight: bold; font-size: 20px;")
         text_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         
+        window_icon = QIcon("codelocklogo.png")  # Replace "icon.png" with the path to your icon image
+        self.setWindowIcon(window_icon)
+
+
 
         # Create a layout for the image
         text_layout = QVBoxLayout()
@@ -51,6 +56,11 @@ class LoginDialog(QDialog):
         self.username_line_edit.setStyleSheet("background-color: #222d4b;")
         self.password_line_edit.setStyleSheet("background-color: #222d4b;")
         self.company_line_edit.setStyleSheet("background-color: #222d4b;")
+
+        self.username_line_edit.setPlaceholderText(" Email...")
+        self.password_line_edit.setPlaceholderText(" Password...")
+        self.company_line_edit.setPlaceholderText(" Company Account ID...")
+        
 
 
         self.logo_label = QLabel(self)
@@ -73,9 +83,9 @@ class LoginDialog(QDialog):
         password_label = QLabel("Password:")
 
         # Set the text color to white for the labels using style sheets
-        company_label.setStyleSheet("color: white;")
-        email_label.setStyleSheet("color: white;")
-        password_label.setStyleSheet("color: white;")
+        company_label.setStyleSheet("color: white; font-family: 'Arial'; font-weight: bold; font-size: 13px;")
+        email_label.setStyleSheet("color: white; font-family: 'Arial'; font-weight: bold; font-size: 13px;")
+        password_label.setStyleSheet("color: white; font-family: 'Arial'; font-weight: bold; font-size: 12px;")
 
         form_layout = QFormLayout()
 
@@ -102,6 +112,9 @@ class LoginDialog(QDialog):
         self.button_box.accepted.connect(self.accept)
         self.button_box.rejected.connect(self.reject)
 
+
+        
+
         # Get the individual buttons within the button box
         ok_button = self.button_box.button(QDialogButtonBox.Ok)
         cancel_button = self.button_box.button(QDialogButtonBox.Cancel)
@@ -109,7 +122,7 @@ class LoginDialog(QDialog):
         # Set the background color for each button
         ok_button.setStyleSheet("background-color: #3898ec;")  # Change 'blue' to your desired color
         cancel_button.setStyleSheet("background-color: #3898ec;")  # Change 'red' to your desired color
-
+        ok_button.setText("Login")
 
         # Set text color to white for the buttons
         self.button_box.setStyleSheet("color: white;")
@@ -127,6 +140,8 @@ class LoginDialog(QDialog):
 
     def get_credentials(self):
         return self.username_line_edit.text(), self.password_line_edit.text(), self.company_line_edit.text()
+    
+    
 
 class OTPDialog(QDialog):
     def __init__(self, parent=None):
