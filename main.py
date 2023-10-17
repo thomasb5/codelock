@@ -2,6 +2,7 @@ import subprocess
 import sys
 import pkg_resources
 import json
+import webbrowser
 
 REQUIRED_PACKAGES = [
     'requests',
@@ -21,6 +22,7 @@ install_missing_packages()
 from PyQt5.QtWidgets import QApplication, QWidget, QLabel,QSpacerItem,QSizePolicy, QLineEdit, QVBoxLayout,QGridLayout, QPushButton, QDialog, QFormLayout, QDialogButtonBox,QHBoxLayout
 from PyQt5.QtGui import QPixmap,QPalette,QIcon # Import QPixmap for handling images
 from PyQt5.QtCore import Qt  # Import QPixmap for handling images
+from PyQt5 import QtCore
 import requests
 from git import Repo
 
@@ -33,16 +35,24 @@ class LoginDialog(QDialog):
         self.setWindowTitle("Authentication Required")
         self.setStyleSheet("background-color: #0e1425;")  # Set the background color here
 
+        image_url = "https://i.imgur.com/sowkmy6.png"
+        image_data = requests.get(image_url).content
+
         
                 # Create a QLabel for the text
         text_label = QLabel("CodeLock®")
         text_label.setStyleSheet("color: white; font-weight: bold; font-size: 20px;")
         text_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         
-        window_icon = QIcon("codelocklogo.png")  # Replace "icon.png" with the path to your icon image
+        image_path = "codelocklogo.png"  # Save the image with the desired name
+        with open(image_path, "wb") as image_file:
+            image_file.write(image_data)
+            print("The image has been downloaded")
+
+        window_icon = QIcon(image_path)
         self.setWindowIcon(window_icon)
 
-
+        pixmap = QPixmap(image_path)
 
         # Create a layout for the image
         text_layout = QVBoxLayout()
@@ -62,17 +72,29 @@ class LoginDialog(QDialog):
         self.company_line_edit.setPlaceholderText(" Company Account ID...")
         
 
+        self.setWindowFlags(
+            QtCore.Qt.Window |
+            QtCore.Qt.CustomizeWindowHint |
+            QtCore.Qt.WindowTitleHint |
+            QtCore.Qt.WindowCloseButtonHint |
+            QtCore.Qt.WindowStaysOnTopHint |
+            QtCore.Qt.WindowMinimizeButtonHint |
+            QtCore.Qt.WindowMaximizeButtonHint 
+            )
 
         self.logo_label = QLabel(self)
-        self.pixmap = QPixmap("codelocklogo.png")
-        self.logo_label.setPixmap(self.pixmap)
+        self.logo_label.setPixmap(pixmap)
         self.logo_label.setScaledContents(True)  # Ensure the image scales properly
         self.logo_label.setAlignment(Qt.AlignmentFlag.AlignCenter)  # Center the image
         self.logo_label.setFixedSize(100, 100)  # Adjust the size as needed
 
+        window_icon = QIcon(pixmap)
+        self.setWindowIcon(window_icon)
+
+
         layout = QGridLayout()
-        layout.addWidget(self.logo_label, 2, 0, 1, 1)  # Image in row 0, column 0
-        layout.addLayout(text_layout,2 , 1, 1, 1)  # Text layout in row 1, column 0
+        layout.addWidget(self.logo_label, 2, 0, 0, 0)  # Image in row 0, column 0
+        layout.addLayout(text_layout, 1, 0, 1, 1)  # Text layout in row 1, column 0
 
        
         form_layout = QFormLayout()
@@ -81,6 +103,8 @@ class LoginDialog(QDialog):
         company_label = QLabel("Company ID:")
         email_label = QLabel("Email:")
         password_label = QLabel("Password:")
+
+
 
         # Set the text color to white for the labels using style sheets
         company_label.setStyleSheet("color: white; font-family: 'Arial'; font-weight: bold; font-size: 13px;")
@@ -113,8 +137,6 @@ class LoginDialog(QDialog):
         self.button_box.rejected.connect(self.reject)
 
 
-        
-
         # Get the individual buttons within the button box
         ok_button = self.button_box.button(QDialogButtonBox.Ok)
         cancel_button = self.button_box.button(QDialogButtonBox.Cancel)
@@ -127,16 +149,25 @@ class LoginDialog(QDialog):
         # Set text color to white for the buttons
         self.button_box.setStyleSheet("color: white;")
 
+
         main_layout = QVBoxLayout()
         main_layout.addLayout(layout)  # Add the grid layout with the image and text layout
         main_layout.addWidget(self.logo_label)  # Add the logo label to the top
         main_layout.addLayout(form_layout)
         main_layout.addWidget(self.button_box)
-        
-        
 
         self.setLayout(main_layout)
         self.resize(315, 250)
+
+        help_button = QPushButton("Help")
+        help_button.setStyleSheet("background-color: #3898ec; color: white;")
+        help_button.clicked.connect(self.open_help_website)
+
+        self.button_box.addButton(help_button, QDialogButtonBox.HelpRole)
+
+    def open_help_website(self):
+        help_url = "https://codelock.it"
+        webbrowser.open(help_url)
 
     def get_credentials(self):
         return self.username_line_edit.text(), self.password_line_edit.text(), self.company_line_edit.text()
