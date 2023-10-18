@@ -196,20 +196,51 @@ class OTPDialog(QDialog):
     def __init__(self, parent=None):
         super(OTPDialog, self).__init__(parent)
         print("OTPDialog init")
-        self.setWindowTitle("Enter One Time Password")
+        self.setWindowTitle("OTP")
+        self.setStyleSheet("background-color: #0e1425;")  # Set the background color here
 
+        self.setWindowFlags(QtCore.Qt.WindowMinimizeButtonHint |
+                            QtCore.Qt.WindowCloseButtonHint |
+                            QtCore.Qt.WindowMaximizeButtonHint 
+                            )
 
+        # Create a QLabel for the text
+        text_label = QLabel("CodeLock®")
+        text_label.setStyleSheet("color: white; font-weight: bold; font-size: 20px;")
+        text_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        # Create a layout for the image
+        text_layout = QVBoxLayout()
+        text_layout.addWidget(text_label)
+        
         self.otp_line_edit = QLineEdit()
+        self.otp_line_edit.setPlaceholderText("Enter One Time Password")
+        self.otp_line_edit.setStyleSheet(
+            "background-color: #1f2b50; color: white; border: 1px solid #365db9; "
+            "border-radius: 5px; padding: 5px; font-size: 14px;"
+        )
 
         form_layout = QFormLayout()
-        form_layout.addRow("OTP:", self.otp_line_edit)
+        form_layout.addRow(self.otp_line_edit)
 
-        self.button_box = QDialogButtonBox(QDialogButtonBox.Ok)
+        self.button_box = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
         self.button_box.accepted.connect(self.accept)
+        self.button_box.rejected.connect(self.reject)
+
+        ok_button = self.button_box.button(QDialogButtonBox.Ok)
+        cancel_button = self.button_box.button(QDialogButtonBox.Cancel)
+        ok_button.setStyleSheet("background-color: #3898ec;")
+        cancel_button.setStyleSheet("background-color: #3898ec;")
+        ok_button.setText("Submit")
+
+        self.button_box.setStyleSheet("color: white;")
 
         main_layout = QVBoxLayout()
+        main_layout.addLayout(text_layout)
         main_layout.addLayout(form_layout)
         main_layout.addWidget(self.button_box)
+
+        self.resize(250, 175)
 
         self.setLayout(main_layout)
 
