@@ -19,7 +19,7 @@ def install_missing_packages():
 install_missing_packages()
 
 
-from PyQt5.QtWidgets import QApplication, QWidget, QLabel,QSpacerItem,QSizePolicy, QLineEdit, QVBoxLayout,QGridLayout, QPushButton, QDialog, QFormLayout, QDialogButtonBox,QHBoxLayout
+from PyQt5.QtWidgets import QApplication,QCheckBox ,QWidget, QLabel,QSpacerItem,QSizePolicy, QLineEdit, QVBoxLayout,QGridLayout, QPushButton, QDialog, QFormLayout, QDialogButtonBox,QHBoxLayout
 from PyQt5.QtGui import QPixmap,QPalette,QIcon # Import QPixmap for handling images
 from PyQt5.QtCore import Qt  # Import QPixmap for handling images
 from PyQt5 import QtCore
@@ -62,14 +62,18 @@ class LoginDialog(QDialog):
         self.password_line_edit = QLineEdit()
         self.password_line_edit.setEchoMode(QLineEdit.Password)
         self.company_line_edit = QLineEdit()
+        
+        line_edit_style = (
+            "background-color: #1f2b50; color: white; border: 1px solid #365db9; "
+            "border-radius: 5px; padding: 5px; font-size: 14px;"
+        )
+        self.username_line_edit.setStyleSheet(line_edit_style)
+        self.password_line_edit.setStyleSheet(line_edit_style)
+        self.company_line_edit.setStyleSheet(line_edit_style)
 
-        self.username_line_edit.setStyleSheet("background-color: #222d4b;")
-        self.password_line_edit.setStyleSheet("background-color: #222d4b;")
-        self.company_line_edit.setStyleSheet("background-color: #222d4b;")
-
-        self.username_line_edit.setPlaceholderText(" Email...")
-        self.password_line_edit.setPlaceholderText(" Password...")
-        self.company_line_edit.setPlaceholderText(" Company Account ID...")
+        self.username_line_edit.setPlaceholderText("Email...")
+        self.password_line_edit.setPlaceholderText("Password...")
+        self.company_line_edit.setPlaceholderText("Company Account ID...")
         
 
         self.setWindowFlags(
@@ -105,7 +109,6 @@ class LoginDialog(QDialog):
         password_label = QLabel("Password:")
 
 
-
         # Set the text color to white for the labels using style sheets
         company_label.setStyleSheet("color: white; font-family: 'Arial'; font-weight: bold; font-size: 13px;")
         email_label.setStyleSheet("color: white; font-family: 'Arial'; font-weight: bold; font-size: 13px;")
@@ -117,8 +120,17 @@ class LoginDialog(QDialog):
         
         form_layout.addRow(company_label, self.company_line_edit)
         form_layout.addRow(email_label, self.username_line_edit)
-        form_layout.addRow(password_label, self.password_line_edit)     
+        form_layout.addRow(password_label, self.password_line_edit)
         
+     
+        self.show_password_checkbox = QCheckBox("Show Password")
+        self.show_password_checkbox.setStyleSheet("QCheckBox { color: white; }")
+        self.show_password_checkbox.setChecked(False)  # You can set the initial state as needed
+
+
+        self.show_password_checkbox.stateChanged.connect(self.toggle_password_visibility)        
+        form_layout.addRow(self.show_password_checkbox)
+
         palette = self.password_line_edit.palette()
         palette.setColor(QPalette.Text, Qt.white)
         self.password_line_edit.setPalette(palette)
@@ -164,6 +176,12 @@ class LoginDialog(QDialog):
         help_button.clicked.connect(self.open_help_website)
 
         self.button_box.addButton(help_button, QDialogButtonBox.HelpRole)
+    
+    def toggle_password_visibility(self):
+        if self.show_password_checkbox.isChecked():
+            self.password_line_edit.setEchoMode(QLineEdit.Normal)
+        else:
+            self.password_line_edit.setEchoMode(QLineEdit.Password)
 
     def open_help_website(self):
         help_url = "https://codelock.it"
